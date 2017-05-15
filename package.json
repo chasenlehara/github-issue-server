@@ -1,6 +1,6 @@
 {
   "name": "github-issue-server",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Real-time server for handling GitHub webhooks and persisting ordered issues locally.",
   "homepage": "https://github.com/chasenlehara/github-issue-server",
   "repository": {
