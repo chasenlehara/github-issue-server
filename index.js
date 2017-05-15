@@ -26,7 +26,7 @@ const issuesDB = (fs.existsSync(issuesFilePath)) ? JSON.parse(fs.readFileSync(is
 
 /* Static server */
 const app = express();
-app.use(express.static(__dirname));
+app.use(express.static(process.cwd()));
 
 /* Socket.io */
 const httpServer = require('http').Server(app);
