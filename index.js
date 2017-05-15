@@ -10,16 +10,6 @@ if (!authorizationToken) {
   throw new Error('No authorization token provided; please include it as the first argument to this script.');
 }
 
-/* Set up ngrok */
-ngrok.connect(function(error, url) {
-  if (error) {
-    console.error('Failed to connect ngrok with error:', error);
-  } else {
-    console.info(`Started up ngrok server, webhook available at:
-      ${url}/api/webhook`);
-  }
-});
-
 /* Set up our issues file “database” */
 const issuesFilePath = 'issues.json';
 const issuesDB = (fs.existsSync(issuesFilePath)) ? JSON.parse(fs.readFileSync(issuesFilePath, {encoding: 'utf8'})) : {};
@@ -81,16 +71,16 @@ app.post('/api/webhook', function(request, response) {
   getContentFromStream(request, function(body) {
     try {
       const payload = JSON.parse(body);
+      const issue = payload.issue;
+      console.info(`Received “${payload.action}” action from GitHub for issue “${issue.title}”`);
       if (payload.action === 'closed') {
-        io.emit('issue removed', payload.issue);
+        io.emit('issue removed', issue);
       } else if (payload.action === 'edited') {
-        io.emit('issue updated', payload.issue);
+        io.emit('issue updated', issue);
       } else if (payload.action === 'opened') {
-        io.emit('issue created', payload.issue);
+        io.emit('issue created', issue);
       } else if (payload.action === 'reopened') {
-        io.emit('issue created', payload.issue);
-      } else {
-        console.error('Received unknown action: ' + payload.action);
+        io.emit('issue created', issue);
       }
     } catch (error) {
       console.error(error);
@@ -103,6 +93,16 @@ app.post('/api/webhook', function(request, response) {
 httpServer.listen(port, function() {
   console.info(`Started up server, available at:
     http://localhost:${port}/`);
+});
+
+/* Set up ngrok */
+ngrok.connect(port, function(error, url) {
+  if (error) {
+    console.error('Failed to connect ngrok with error:', error);
+  } else {
+    console.info(`Started up ngrok server; GitHub Webhook Payload URL:
+    ${url}/api/webhook`);
+  }
 });
 
 function getContentFromStream(request, callback) {
