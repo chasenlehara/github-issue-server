@@ -59,10 +59,11 @@ app.post(requestPath, function(req, res) {
 
 app.put(`${requestPath}/:id`, function(req, res) {
   getContentFromStream(req, function(body) {
-    const issue = JSON.parse(body);
-    setSortPositionForIssueWithID(issue.sort_position, req.params.id);
+    const issue = Object.assign(JSON.parse(body), {id: req.params.id});
+    setSortPositionForIssueWithID(issue.sort_position, issue.id);
     saveIssuesDB();
     res.send(body);
+    io.emit('issue updated', issue);
   });
 });
 
