@@ -78,9 +78,8 @@ app.post('/api/webhook', function(request, response) {
         io.emit('issue removed', issue);
       } else if (payload.action === 'edited') {
         io.emit('issue updated', issue);
-      } else if (payload.action === 'opened') {
-        io.emit('issue created', issue);
-      } else if (payload.action === 'reopened') {
+      } else if (payload.action === 'opened' || payload.action === 'reopened') {
+        updateIssueWithFirstSortPosition(issue);
         io.emit('issue created', issue);
       }
     } catch (error) {
@@ -178,4 +177,12 @@ function maxAndMinInIssuesDB() {
 
 function setSortPositionForIssueWithID(sortPosition, id) {
   issuesDB[id] = sortPosition;
+}
+
+function updateIssueWithFirstSortPosition(issue) {
+  const {min} = maxAndMinInIssuesDB();
+  issue.sort_position = (Number.MIN_SAFE_INTEGER + min) / 2;
+  setSortPositionForIssueWithID(issue.sort_position, issue.id);
+  saveIssuesDB();
+  return issue;
 }
