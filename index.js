@@ -144,7 +144,7 @@ function saveIssuesDB() {
     if (error) {
       console.error('Failed to save issues file with error:', error);
     } else {
-      console.info('Successfully saved issues file!');
+      console.info(`Successfully saved ${issuesFilePath}`);
     }
   });
 }
