@@ -181,8 +181,11 @@ function setSortPositionForIssueWithID(sortPosition, id) {
 
 function updateIssueWithFirstSortPosition(issue) {
   const {min} = maxAndMinInIssuesDB();
-  issue.sort_position = (Number.MIN_SAFE_INTEGER + min) / 2;
-  setSortPositionForIssueWithID(issue.sort_position, issue.id);
-  saveIssuesDB();
+  issue.sort_position = getSortPositionForIssueWithID(issue.id);
+  if (issue.sort_position === undefined) {
+    issue.sort_position = (Number.MIN_SAFE_INTEGER + min) / 2;
+    setSortPositionForIssueWithID(issue.sort_position, issue.id);
+    saveIssuesDB();
+  }
   return issue;
 }
