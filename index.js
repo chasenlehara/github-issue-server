@@ -75,6 +75,7 @@ app.post('/api/webhook', function(request, response) {
       const issue = payload.issue;
       console.info(`Received “${payload.action}” action from GitHub for issue “${issue.title}”`);
       if (payload.action === 'closed') {
+        removeSortPositionForIssueWithID(issue.id);
         io.emit('issue removed', issue);
       } else if (payload.action === 'edited') {
         io.emit('issue updated', issue);
@@ -129,6 +130,13 @@ function getRequestOptions(req, method) {
 
 function getSortPositionForIssueWithID(id) {
   return issuesDB[id];
+}
+
+function removeSortPositionForIssueWithID(id) {
+  if (issuesDB[id]) {
+    delete issuesDB[id];
+    saveIssuesDB();
+  }
 }
 
 function saveIssuesDB() {
